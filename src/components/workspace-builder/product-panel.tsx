@@ -40,22 +40,16 @@ export function ProductPanel({
 					</button>
 				))}
 			</div>
-			{products.length > 0 ? (
-				<div className="mt-4 grid grid-cols-2 gap-3">
-					{products.map((product) => (
-						<ProductCard
-							key={product.id}
-							product={product}
-							selected={selectedIds.has(product.id)}
-							onSelect={() => onToggle(product)}
-						/>
-					))}
-				</div>
-			) : (
-				<p className="mt-4 rounded-xl border border-dashed border-black/15 bg-cream/40 p-6 text-center text-sm text-prime/60">
-					Accessories are coming soon
-				</p>
-			)}
+			<div className="mt-4 grid grid-cols-2 gap-3">
+				{products.map((product) => (
+					<ProductCard
+						key={product.id}
+						product={product}
+						selected={selectedIds.has(product.id)}
+						onSelect={() => onToggle(product)}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }
