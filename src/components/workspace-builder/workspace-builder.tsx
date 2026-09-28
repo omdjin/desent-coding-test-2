@@ -109,7 +109,8 @@ export function WorkspaceBuilder() {
 					onToggle={handleToggle}
 				/>
 
-				<div className="relative h-[420px] overflow-hidden rounded-2xl border border-black/10 bg-[#f1ebe2] sm:h-[540px]">
+				{/* On small screens the room comes first so each tap visibly changes it. */}
+				<div className="relative order-first h-[380px] overflow-hidden rounded-2xl border border-black/10 bg-[#f1ebe2] sm:h-[540px] lg:order-none">
 					<WorkspaceScene
 						items={selected}
 						standing={standing}
@@ -147,7 +148,7 @@ export function WorkspaceBuilder() {
 						</button>
 					</div>
 					<p className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs text-prime/70 shadow-sm backdrop-blur">
-						Drag to look around · hover anything to see what it is
+						Drag to look around · tap or hover items for details
 					</p>
 				</div>
 			</div>
@@ -176,7 +177,7 @@ export function WorkspaceBuilder() {
 					<button
 						type="button"
 						onClick={() => setCheckoutOpen(true)}
-						className="rounded-full bg-prime px-5 py-2.5 text-sm font-medium text-prime-foreground transition-opacity hover:opacity-90"
+						className="w-full rounded-full bg-prime px-5 py-2.5 text-sm font-medium text-prime-foreground transition-opacity hover:opacity-90 sm:w-auto"
 					>
 						Rent your setup
 					</button>

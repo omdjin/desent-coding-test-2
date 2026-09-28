@@ -24,7 +24,7 @@ export function ProductPanel({
 	onToggle: (product: Product) => void;
 }) {
 	return (
-		<div className="flex min-w-0 flex-col rounded-2xl border border-black/10 bg-white p-4 lg:h-[540px]">
+		<div className="flex h-[460px] min-w-0 flex-col rounded-2xl border border-black/10 bg-white p-4 lg:h-[540px]">
 			<div className="flex flex-wrap gap-2">
 				{categories.map((category) => (
 					<button

@@ -20,7 +20,7 @@ export function BundlePresets({
 			<p className="shrink-0 text-sm font-medium text-prime">
 				Start from a monis bundle
 			</p>
-			<div className="flex flex-wrap gap-2">
+			<div className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0 sm:pb-0">
 				{bundles.map((bundle) => {
 					const items = products.filter((p) =>
 						bundle.productIds.includes(p.id),
@@ -33,7 +33,7 @@ export function BundlePresets({
 							title={bundle.tagline}
 							aria-pressed={active}
 							onClick={() => onApply(bundle)}
-							className={`flex items-baseline gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
+							className={`flex shrink-0 items-baseline gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
 								active
 									? "border-prime bg-prime text-prime-foreground"
 									: "border-black/10 bg-white text-prime hover:border-prime/40 hover:bg-cream"
