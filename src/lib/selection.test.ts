@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { Product, Slot } from "../data/products";
-import { blockedReason, cardState, quote, toggleProduct } from "./selection.ts";
+import { bundles } from "../data/bundles.ts";
+import { type Product, products, type Slot } from "../data/products.ts";
+import {
+	blockedReason,
+	cardState,
+	formatMoney,
+	formatWeekly,
+	quote,
+	toggleProduct,
+} from "./selection.ts";
 
 const item = (
 	id: string,
@@ -88,4 +96,23 @@ test("quote keeps cents exact", () => {
 		total: 58.4,
 		savings: 25.6,
 	});
+});
+
+test("every bundle builds exactly as listed from the real catalogue", () => {
+	for (const bundle of bundles) {
+		let selected: string[] = [];
+		for (const id of bundle.productIds) {
+			const product = products.find((p) => p.id === id);
+			assert.ok(product, `${bundle.id}: unknown product ${id}`);
+			selected = toggleProduct(selected, product, products);
+		}
+		assert.deepEqual(selected, bundle.productIds, bundle.id);
+	}
+});
+
+test("prices format as dollars, with free decor", () => {
+	assert.equal(formatWeekly(6.5), "$6.50/week");
+	assert.equal(formatWeekly(21), "$21/week");
+	assert.equal(formatWeekly(0), "Free");
+	assert.equal(formatMoney(1188), "$1,188");
 });
