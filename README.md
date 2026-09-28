@@ -25,5 +25,6 @@ pnpm dev
 - `pnpm lint` — Biome check
 - `pnpm test` — selection and pricing rules (Node's built-in test runner)
 - `pnpm build` — production build
+- `pnpm deploy:prod` — build and deploy the current working copy to Vercel production (needs `npx vercel login` once). Merging to `main` doesn't deploy automatically, so run this after each merge.
 
 Product data lives in `src/data/products.ts` and `src/data/bundles.ts`; the selection and pricing rules are in `src/lib/selection.ts`; the 3D scene is in `src/components/workspace-builder/scene/`.

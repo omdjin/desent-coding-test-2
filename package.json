@@ -9,7 +9,8 @@
 		"start": "next start",
 		"lint": "biome check .",
 		"test": "node --test",
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+		"deploy:prod": "npx vercel --prod --yes"
 	},
 	"dependencies": {
 		"@react-three/drei": "^10.7.9",
