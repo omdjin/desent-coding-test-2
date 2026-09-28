@@ -13,10 +13,12 @@ const DAMPING = 18;
 export function PlacedItem({
 	position,
 	rotationY = 0,
+	tilt = 0,
 	children,
 }: {
 	position: Vec3;
 	rotationY?: number;
+	tilt?: number;
 	children: ReactNode;
 }) {
 	const ref = useRef<THREE.Group>(null);
@@ -67,5 +69,9 @@ export function PlacedItem({
 		if (settling) invalidate();
 	});
 
-	return <group ref={ref}>{children}</group>;
+	return (
+		<group ref={ref}>
+			<group rotation-x={tilt}>{children}</group>
+		</group>
+	);
 }
