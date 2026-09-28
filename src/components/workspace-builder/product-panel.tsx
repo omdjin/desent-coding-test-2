@@ -1,42 +1,40 @@
-import type { Product } from "@/data/products";
+import type { Category, Product } from "@/data/products";
+import type { CardState } from "@/lib/selection";
 import { ProductCard } from "./product-card";
 
-export type PanelTab = "chairs" | "desks" | "accessories";
-
-const TABS: { key: PanelTab; label: string }[] = [
-	{ key: "chairs", label: "Chairs" },
-	{ key: "desks", label: "Desks" },
-	{ key: "accessories", label: "Accessories" },
-];
-
 export function ProductPanel({
-	activeTab,
-	onTabChange,
+	categories,
+	activeCategory,
+	onCategoryChange,
 	products,
-	selectedIds,
+	stateOf,
+	reasonOf,
 	onToggle,
 }: {
-	activeTab: PanelTab;
-	onTabChange: (tab: PanelTab) => void;
+	categories: { key: Category; label: string }[];
+	activeCategory: Category;
+	onCategoryChange: (category: Category) => void;
 	products: Product[];
-	selectedIds: Set<string>;
+	stateOf: (product: Product) => CardState;
+	reasonOf: (product: Product) => string | null;
 	onToggle: (product: Product) => void;
 }) {
 	return (
-		<div className="rounded-2xl border border-black/10 bg-white p-4">
-			<div className="flex gap-2 rounded-full bg-cream p-1">
-				{TABS.map((tab) => (
+		<div className="flex min-w-0 flex-col rounded-2xl border border-black/10 bg-white p-4">
+			<div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+				{categories.map((category) => (
 					<button
-						key={tab.key}
+						key={category.key}
 						type="button"
-						onClick={() => onTabChange(tab.key)}
-						className={`flex-1 rounded-full px-3 py-1.5 text-center text-sm font-medium transition-colors ${
-							activeTab === tab.key
+						onClick={() => onCategoryChange(category.key)}
+						aria-pressed={activeCategory === category.key}
+						className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+							activeCategory === category.key
 								? "bg-prime text-prime-foreground"
-								: "text-prime hover:bg-white/60"
+								: "bg-cream text-prime hover:bg-cream/60"
 						}`}
 					>
-						{tab.label}
+						{category.label}
 					</button>
 				))}
 			</div>
@@ -45,7 +43,8 @@ export function ProductPanel({
 					<ProductCard
 						key={product.id}
 						product={product}
-						selected={selectedIds.has(product.id)}
+						state={stateOf(product)}
+						reason={reasonOf(product)}
 						onSelect={() => onToggle(product)}
 					/>
 				))}

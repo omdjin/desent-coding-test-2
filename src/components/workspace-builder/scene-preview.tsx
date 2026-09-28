@@ -15,8 +15,9 @@ export function ScenePreview({
 }) {
 	const deskWidth = desk?.id === "standing-desk" ? 300 : 260;
 	const deskX = 200 - deskWidth / 2;
-	const deskColor = desk?.tint ?? "#e5ded2";
-	const chairColor = chair?.tint ?? "#d9d9d9";
+	const deskColor = desk?.model.kind === "desk" ? desk.model.top : "#e5ded2";
+	const chairColor =
+		chair?.model.kind === "chair" ? chair.model.fabric : "#d9d9d9";
 	const monitorSlots = [-70, 0, 70];
 
 	return (
@@ -96,7 +97,7 @@ export function ScenePreview({
 					transform="translate(90, 100)"
 				>
 					<rect x="-3" y="30" width="6" height="24" fill="#15252e" />
-					<path d="M-3 30 L-30 5 L-18 -5 L4 22 Z" fill={lamp.tint} />
+					<path d="M-3 30 L-30 5 L-18 -5 L4 22 Z" fill="#f9f2ea" />
 				</g>
 			)}
 
@@ -107,7 +108,7 @@ export function ScenePreview({
 					transform="translate(320, 110)"
 				>
 					<rect x="-14" y="30" width="28" height="24" rx="3" fill="#b08968" />
-					<circle cx="0" cy="10" r="22" fill={plant.tint} />
+					<circle cx="0" cy="10" r="22" fill="#4d7c4a" />
 				</g>
 			)}
 		</svg>
