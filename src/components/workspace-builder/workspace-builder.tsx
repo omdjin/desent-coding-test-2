@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { accessories, chairs, desks, type Product } from "@/data/products";
+import { CheckoutSummary } from "./checkout-summary";
 import { type PanelTab, ProductPanel } from "./product-panel";
 import { ScenePreview } from "./scene-preview";
 
@@ -10,6 +11,8 @@ export function WorkspaceBuilder() {
 	const [deskId, setDeskId] = useState<string | undefined>(desks[0]?.id);
 	const [chairId, setChairId] = useState<string | undefined>(chairs[0]?.id);
 	const [accessoryIds, setAccessoryIds] = useState<Set<string>>(new Set());
+	const [checkoutOpen, setCheckoutOpen] = useState(false);
+	const [confirmed, setConfirmed] = useState(false);
 
 	const desk = desks.find((d) => d.id === deskId);
 	const chair = chairs.find((c) => c.id === chairId);
@@ -43,10 +46,15 @@ export function WorkspaceBuilder() {
 	}
 
 	const readyToRent = Boolean(deskId && chairId);
-	const total =
-		(desk?.pricePerWeek ?? 0) +
-		(chair?.pricePerWeek ?? 0) +
-		selectedAccessories.reduce((sum, a) => sum + a.pricePerWeek, 0);
+	const checkoutItems = [desk, chair, ...selectedAccessories].filter(
+		(item): item is Product => Boolean(item),
+	);
+	const total = checkoutItems.reduce((sum, item) => sum + item.pricePerWeek, 0);
+
+	function closeCheckout() {
+		setCheckoutOpen(false);
+		setConfirmed(false);
+	}
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 pb-32">
@@ -82,11 +90,22 @@ export function WorkspaceBuilder() {
 				<button
 					type="button"
 					disabled={!readyToRent}
+					onClick={() => setCheckoutOpen(true)}
 					className="rounded-full bg-prime px-5 py-2.5 text-sm font-medium text-prime-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
 				>
 					Rent your setup
 				</button>
 			</div>
+
+			{checkoutOpen && (
+				<CheckoutSummary
+					items={checkoutItems}
+					total={total}
+					confirmed={confirmed}
+					onClose={closeCheckout}
+					onConfirm={() => setConfirmed(true)}
+				/>
+			)}
 		</div>
 	);
 }
