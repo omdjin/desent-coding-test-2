@@ -1,95 +1,180 @@
-export type Category = "desk" | "chair" | "monitor" | "lamp" | "plant";
+export type Category =
+	| "desks"
+	| "chairs"
+	| "monitors"
+	| "gear"
+	| "tech"
+	| "room";
+
+export type Slot = "desk" | "chair" | "monitor" | "deskLamp" | "plant";
+
+export type Wallpaper = "sunset" | "ocean" | "aurora" | "neon" | "mono";
+
+export type ModelSpec =
+	| {
+			kind: "desk";
+			width: number;
+			depth: number;
+			top: string;
+			frame: string;
+			legs: "dual" | "crank";
+	  }
+	| { kind: "chair"; fabric: string; frame: string; headrest: boolean }
+	| {
+			kind: "monitor";
+			inches: number;
+			aspect: "16:9" | "21:9";
+			curved?: boolean;
+			bezel: string;
+			stand: "v" | "column" | "apple";
+			wallpaper: Wallpaper;
+	  }
+	| { kind: "deskLamp"; variant: "bar" }
+	| { kind: "plant"; size: "desk" | "floor" };
 
 export type Product = {
 	id: string;
 	name: string;
 	category: Category;
-	pricePerWeek: number;
-	/** Real product photo shown in the selection card. Omit to fall back to an illustrated icon. */
+	slot: Slot;
+	/** Weekly rate for rentals shorter than a month. */
+	weekly: number;
+	/** Weekly rate once the rental is a month or longer. */
+	weeklyLongTerm: number;
 	image?: string;
-	/** Tint applied to this item's shape in the illustrated scene preview. */
-	tint: string;
+	model: ModelSpec;
 };
 
-export const desks: Product[] = [
+export const CATEGORIES: { key: Category; label: string }[] = [
+	{ key: "desks", label: "Desks" },
+	{ key: "chairs", label: "Chairs" },
+	{ key: "monitors", label: "Monitors" },
+	{ key: "gear", label: "Desk gear" },
+	{ key: "tech", label: "Tech" },
+	{ key: "room", label: "Room" },
+];
+
+const UPLOADS = "https://strapi.monis.rent/uploads";
+
+export const products: Product[] = [
 	{
 		id: "standing-desk",
 		name: "Dual Motor Standing Desk",
-		category: "desk",
-		pricePerWeek: 15,
-		image:
-			"https://strapi.monis.rent/uploads/Dual_Motor_Standing_Desk_8_9f364ae87f.jpg",
-		tint: "#c9b79c",
+		category: "desks",
+		slot: "desk",
+		weekly: 15,
+		weeklyLongTerm: 15,
+		image: `${UPLOADS}/Dual_Motor_Standing_Desk_8_9f364ae87f.jpg`,
+		model: {
+			kind: "desk",
+			width: 1.4,
+			depth: 0.7,
+			top: "#6b4a2f",
+			frame: "#1f1f1f",
+			legs: "dual",
+		},
 	},
 	{
 		id: "mechanical-desk",
 		name: "Mechanical Adjustable Desk",
-		category: "desk",
-		pricePerWeek: 12,
-		image:
-			"https://strapi.monis.rent/uploads/Mechanical_Adjustable_Desk_front_new_a83b8077b0.jpg",
-		tint: "#a98f6b",
+		category: "desks",
+		slot: "desk",
+		weekly: 12,
+		weeklyLongTerm: 12,
+		image: `${UPLOADS}/Mechanical_Adjustable_Desk_front_new_a83b8077b0.jpg`,
+		model: {
+			kind: "desk",
+			width: 1.2,
+			depth: 0.6,
+			top: "#ecebe7",
+			frame: "#1f1f1f",
+			legs: "crank",
+		},
 	},
-];
-
-export const chairs: Product[] = [
 	{
 		id: "fantech-chair",
 		name: "Fantech Ergonomic Chair",
-		category: "chair",
-		pricePerWeek: 10,
-		image:
-			"https://strapi.monis.rent/uploads/fantech_oca259s_chair_6_b632a0c529.jpg",
-		tint: "#15252e",
+		category: "chairs",
+		slot: "chair",
+		weekly: 10,
+		weeklyLongTerm: 10,
+		image: `${UPLOADS}/fantech_oca259s_chair_6_b632a0c529.jpg`,
+		model: {
+			kind: "chair",
+			fabric: "#1d1f22",
+			frame: "#3a3d42",
+			headrest: true,
+		},
 	},
 	{
 		id: "classic-chair",
 		name: "Classic Office Chair",
-		category: "chair",
-		pricePerWeek: 7,
-		tint: "#7a4a2f",
+		category: "chairs",
+		slot: "chair",
+		weekly: 7,
+		weeklyLongTerm: 7,
+		model: {
+			kind: "chair",
+			fabric: "#7a4a2f",
+			frame: "#2a2a2a",
+			headrest: false,
+		},
 	},
-];
-
-export const accessories: Product[] = [
 	{
 		id: "monitor-a24",
 		name: '24" Office Monitor',
-		category: "monitor",
-		pricePerWeek: 5,
-		image:
-			"https://strapi.monis.rent/uploads/24_Full_HD_Office_Monitor_A24i_1_7f987306af.jpg",
-		tint: "#1f2937",
+		category: "monitors",
+		slot: "monitor",
+		weekly: 5,
+		weeklyLongTerm: 5,
+		image: `${UPLOADS}/24_Full_HD_Office_Monitor_A24i_1_7f987306af.jpg`,
+		model: {
+			kind: "monitor",
+			inches: 24,
+			aspect: "16:9",
+			bezel: "#1b1c1f",
+			stand: "v",
+			wallpaper: "aurora",
+		},
 	},
 	{
 		id: "monitor-a27",
 		name: '27" 4K Monitor',
-		category: "monitor",
-		pricePerWeek: 8,
-		image:
-			"https://strapi.monis.rent/uploads/27_4_K_A27_U_Multitasking_Monitor_1_ce29d15357.jpg",
-		tint: "#1f2937",
+		category: "monitors",
+		slot: "monitor",
+		weekly: 8,
+		weeklyLongTerm: 8,
+		image: `${UPLOADS}/27_4_K_A27_U_Multitasking_Monitor_1_ce29d15357.jpg`,
+		model: {
+			kind: "monitor",
+			inches: 27,
+			aspect: "16:9",
+			bezel: "#1b1c1f",
+			stand: "column",
+			wallpaper: "sunset",
+		},
 	},
 	{
 		id: "desk-lamp",
 		name: "Xiaomi LED Desk Lamp",
-		category: "lamp",
-		pricePerWeek: 3,
-		image:
-			"https://strapi.monis.rent/uploads/Xiaomi_Mi_Led_Desk_Lamp_1_S_10_3777ddd163.jpg",
-		tint: "#f9f2ea",
+		category: "gear",
+		slot: "deskLamp",
+		weekly: 3,
+		weeklyLongTerm: 3,
+		image: `${UPLOADS}/Xiaomi_Mi_Led_Desk_Lamp_1_S_10_3777ddd163.jpg`,
+		model: { kind: "deskLamp", variant: "bar" },
 	},
 	{
 		id: "desk-plant",
 		name: "Desk Plant",
-		category: "plant",
-		pricePerWeek: 2,
-		tint: "#4d7c4a",
+		category: "room",
+		slot: "plant",
+		weekly: 2,
+		weeklyLongTerm: 2,
+		model: { kind: "plant", size: "desk" },
 	},
 ];
 
-export const allProducts = [...desks, ...chairs, ...accessories];
-
 export function getProduct(id: string): Product | undefined {
-	return allProducts.find((product) => product.id === id);
+	return products.find((product) => product.id === id);
 }

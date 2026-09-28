@@ -57,9 +57,7 @@ export function CheckoutSummary({
 									className="flex items-center justify-between text-sm"
 								>
 									<span className="text-black">{item.name}</span>
-									<span className="text-prime/70">
-										${item.pricePerWeek}/week
-									</span>
+									<span className="text-prime/70">${item.weekly}/week</span>
 								</li>
 							))}
 						</ul>
