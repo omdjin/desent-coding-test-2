@@ -1,6 +1,11 @@
 import Image from "next/image";
 import type { Product } from "@/data/products";
-import { type CardState, formatWeekly } from "@/lib/selection";
+import {
+	type CardState,
+	formatMoney,
+	formatWeekly,
+	weeklyRate,
+} from "@/lib/selection";
 
 const BADGE: Record<CardState, string> = {
 	selected: "✓ Added",
@@ -13,18 +18,21 @@ export function ProductCard({
 	product,
 	state,
 	reason,
+	weeks,
 	flash = false,
 	onSelect,
 }: {
 	product: Product;
 	state: CardState;
 	reason: string | null;
+	weeks: number;
 	/** Briefly highlights the card after it was picked in the 3D room. */
 	flash?: boolean;
 	onSelect: () => void;
 }) {
 	const selected = state === "selected";
 	const blocked = state === "blocked";
+	const rate = weeklyRate(product, weeks);
 
 	return (
 		<button
@@ -70,7 +78,18 @@ export function ProductCard({
 					{product.name}
 				</p>
 				<p className="text-xs text-prime/60">
-					{blocked ? reason : formatWeekly(product.weekly)}
+					{blocked ? (
+						reason
+					) : (
+						<>
+							{rate < product.weekly && (
+								<s className="mr-1 text-prime/35">
+									{formatMoney(product.weekly)}
+								</s>
+							)}
+							{formatWeekly(rate)}
+						</>
+					)}
 				</p>
 			</div>
 		</button>

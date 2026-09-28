@@ -10,6 +10,7 @@ export function ProductPanel({
 	stateOf,
 	reasonOf,
 	flashId,
+	weeks,
 	onToggle,
 }: {
 	categories: { key: Category; label: string }[];
@@ -19,10 +20,11 @@ export function ProductPanel({
 	stateOf: (product: Product) => CardState;
 	reasonOf: (product: Product) => string | null;
 	flashId: string | null;
+	weeks: number;
 	onToggle: (product: Product) => void;
 }) {
 	return (
-		<div className="flex min-w-0 flex-col rounded-2xl border border-black/10 bg-white p-4 lg:h-[540px]">
+		<div className="flex h-[460px] min-w-0 flex-col rounded-2xl border border-black/10 bg-white p-4 lg:h-[540px]">
 			<div className="flex flex-wrap gap-2">
 				{categories.map((category) => (
 					<button
@@ -48,6 +50,7 @@ export function ProductPanel({
 						state={stateOf(product)}
 						reason={reasonOf(product)}
 						flash={flashId === product.id}
+						weeks={weeks}
 						onSelect={() => onToggle(product)}
 					/>
 				))}

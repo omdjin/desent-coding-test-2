@@ -17,7 +17,7 @@ import {
 } from "react";
 import type * as THREE from "three";
 import type { Product } from "@/data/products";
-import { formatWeekly } from "@/lib/selection";
+import { formatWeekly, weeklyRate } from "@/lib/selection";
 import {
 	layoutScene,
 	type Placement,
@@ -36,11 +36,14 @@ const CAMERA_TARGET: Vec3 = [0, 0.8, -0.05];
 export function WorkspaceScene({
 	items,
 	standing,
+	weeks,
 	resetKey,
 	onPick,
 }: {
 	items: Product[];
 	standing: boolean;
+	/** Rental length, so hover tags show the rate that will actually be charged. */
+	weeks: number;
 	/** Bump to snap the camera back to its starting view. */
 	resetKey: number;
 	onPick: (product: Product) => void;
@@ -71,7 +74,10 @@ export function WorkspaceScene({
 			position={position}
 			rotationY={rotationY}
 			tilt={tilt}
-			tag={{ name: product.name, price: formatWeekly(product.weekly) }}
+			tag={{
+				name: product.name,
+				price: formatWeekly(weeklyRate(product, weeks)),
+			}}
 			hovered={hoveredId === product.id}
 			onHover={(hovering) =>
 				setHoveredId((current) =>

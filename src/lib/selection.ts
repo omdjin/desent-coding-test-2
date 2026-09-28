@@ -89,14 +89,45 @@ export function toggleProduct(
 
 const LONG_TERM_WEEKS = 4;
 
+/** Rental lengths offered; monis.rent counts a month as 4 weeks. */
+export const DURATIONS = [
+	{ weeks: 1, label: "1 week" },
+	{ weeks: 2, label: "2 weeks" },
+	{ weeks: 3, label: "3 weeks" },
+	{ weeks: 4, label: "1 month" },
+	{ weeks: 8, label: "2 months" },
+	{ weeks: 12, label: "3 months" },
+	{ weeks: 24, label: "6 months" },
+] as const;
+
+export function durationLabel(weeks: number): string {
+	return DURATIONS.find((d) => d.weeks === weeks)?.label ?? `${weeks} weeks`;
+}
+
 export function weeklyRate(product: Product, weeks: number): number {
 	return weeks >= LONG_TERM_WEEKS ? product.weeklyLongTerm : product.weekly;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+const dollars = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: "USD",
+	maximumFractionDigits: 0,
+});
+const cents = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: "USD",
+	minimumFractionDigits: 2,
+});
+
+/** "$21", "$6.50", "$1,188" — cents only when there are any. */
+export function formatMoney(amount: number): string {
+	return (Number.isInteger(amount) ? dollars : cents).format(amount);
+}
+
 export function formatWeekly(amount: number): string {
-	return amount === 0 ? "Free" : `$${amount}/week`;
+	return amount === 0 ? "Free" : `${formatMoney(amount)}/week`;
 }
 
 export function quote(items: Product[], weeks: number) {
