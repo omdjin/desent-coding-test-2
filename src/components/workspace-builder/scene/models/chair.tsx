@@ -7,8 +7,9 @@ const LEG_ANGLES = [0, 1, 2, 3, 4].map((i) => (i / 5) * Math.PI * 2);
 
 /** Office chair facing -z (towards the desk). */
 export function Chair({ spec }: { spec: ChairSpec }) {
-	const { fabric, frame, headrest } = spec;
+	const { fabric, frame, base, headrest } = spec;
 	const frameMat = { color: frame, metalness: 0.55, roughness: 0.4 };
+	const baseMat = { color: base, metalness: 0.85, roughness: 0.22 };
 	const fabricMat = { color: fabric, roughness: 0.92 };
 
 	return (
@@ -17,7 +18,7 @@ export function Chair({ spec }: { spec: ChairSpec }) {
 				<group key={angle} rotation-y={angle}>
 					<mesh position={[0, 0.075, 0.16]} rotation-x={0.12}>
 						<boxGeometry args={[0.045, 0.028, 0.32]} />
-						<meshStandardMaterial {...frameMat} />
+						<meshStandardMaterial {...baseMat} />
 					</mesh>
 					<mesh position={[0, 0.028, 0.31]}>
 						<sphereGeometry args={[0.028, 14, 10]} />
@@ -27,7 +28,7 @@ export function Chair({ spec }: { spec: ChairSpec }) {
 			))}
 			<mesh position={[0, 0.1, 0]}>
 				<cylinderGeometry args={[0.045, 0.06, 0.06, 20]} />
-				<meshStandardMaterial {...frameMat} />
+				<meshStandardMaterial {...baseMat} />
 			</mesh>
 			<mesh position={[0, 0.27, 0]}>
 				<cylinderGeometry args={[0.022, 0.022, 0.3, 16]} />
@@ -52,13 +53,13 @@ export function Chair({ spec }: { spec: ChairSpec }) {
 				<meshStandardMaterial {...frameMat} />
 			</mesh>
 			<group position={[0, 0.86, 0.3]} rotation-x={-0.14}>
-				<RoundedBox args={[0.47, 0.57, 0.03]} radius={0.014}>
+				<RoundedBox args={[0.48, 0.58, 0.05]} radius={0.022}>
 					<meshStandardMaterial {...frameMat} />
 				</RoundedBox>
 				<RoundedBox
-					args={[0.42, 0.52, 0.036]}
-					radius={0.014}
-					position-z={-0.006}
+					args={[0.43, 0.53, 0.06]}
+					radius={0.022}
+					position-z={-0.008}
 				>
 					<meshStandardMaterial {...fabricMat} />
 				</RoundedBox>

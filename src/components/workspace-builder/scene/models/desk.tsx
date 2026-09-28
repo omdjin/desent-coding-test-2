@@ -7,11 +7,12 @@ const TOP_THICKNESS = 0.028;
 const LOWER_COLUMN = 0.44;
 
 export function Desk({ spec, height }: { spec: DeskSpec; height: number }) {
-	const { width, depth, top, frame, legs } = spec;
+	const { width, depth, top, frame, column, legs } = spec;
 	const legX = width / 2 - 0.13;
 	const underTop = height - TOP_THICKNESS;
 	const upperLength = underTop - LOWER_COLUMN + 0.04;
 	const metal = { color: frame, metalness: 0.45, roughness: 0.45 };
+	const columnMetal = { color: column, metalness: 0.7, roughness: 0.32 };
 
 	return (
 		<group>
@@ -40,18 +41,14 @@ export function Desk({ spec, height }: { spec: DeskSpec; height: number }) {
 					</RoundedBox>
 					<mesh position={[0, 0.035 + LOWER_COLUMN / 2, 0]}>
 						<boxGeometry args={[0.078, LOWER_COLUMN, 0.058]} />
-						<meshStandardMaterial {...metal} />
+						<meshStandardMaterial {...columnMetal} />
 					</mesh>
 					<mesh
 						position={[0, LOWER_COLUMN - 0.04 + upperLength / 2, 0]}
 						scale-y={upperLength}
 					>
 						<boxGeometry args={[0.064, 1, 0.046]} />
-						<meshStandardMaterial
-							color={legs === "dual" ? "#9a9da1" : frame}
-							metalness={0.7}
-							roughness={0.3}
-						/>
+						<meshStandardMaterial {...columnMetal} roughness={0.25} />
 					</mesh>
 					<mesh position={[0, underTop - 0.01, 0]}>
 						<boxGeometry args={[0.07, 0.02, depth * 0.78]} />

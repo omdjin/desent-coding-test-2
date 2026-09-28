@@ -209,6 +209,106 @@ export function windowViewTexture() {
 	});
 }
 
+/** Full-size keyboard layout: 6 rows of keys plus a numpad block. */
+export function keyboardTexture(body: string, key: string, legend: string) {
+	return canvasTexture(`keyboard-${body}-${key}`, 1024, 320, (ctx, w, h) => {
+		ctx.fillStyle = body;
+		ctx.fillRect(0, 0, w, h);
+		const pad = 18;
+		const rows = 6;
+		const unit = (h - pad * 2) / rows;
+		const mainWidth = w * 0.78;
+		const drawKey = (x: number, y: number, kw: number, kh: number) => {
+			ctx.fillStyle = key;
+			ctx.beginPath();
+			ctx.roundRect(x + 3, y + 3, kw - 6, kh - 6, 7);
+			ctx.fill();
+			ctx.fillStyle = legend;
+			ctx.fillRect(x + kw * 0.3, y + kh * 0.45, kw * 0.12, 3);
+		};
+		const layout = [
+			[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+			[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+			[1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5],
+			[1.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.2],
+			[2.3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.7],
+			[1.3, 1.3, 1.3, 6, 1.3, 1.3, 1, 1, 1],
+		];
+		layout.forEach((row, r) => {
+			const total = row.reduce((a, b) => a + b, 0);
+			const u = (mainWidth - pad) / total;
+			let x = pad;
+			for (const size of row) {
+				drawKey(x, pad + r * unit, size * u, r === 0 ? unit * 0.8 : unit);
+				x += size * u;
+			}
+		});
+		const numX = mainWidth + 12;
+		const numU = (w - numX - pad) / 4;
+		for (let r = 1; r < rows; r++) {
+			for (let c = 0; c < 4; c++)
+				drawKey(numX + c * numU, pad + r * unit, numU, unit);
+		}
+	});
+}
+
+export function hueGradientTexture() {
+	return canvasTexture("hue-gradient", 64, 512, (ctx, w, h) => {
+		const g = ctx.createLinearGradient(0, 0, 0, h);
+		g.addColorStop(0, "#ff4fa3");
+		g.addColorStop(0.5, "#ff7a45");
+		g.addColorStop(1, "#ffc15e");
+		ctx.fillStyle = g;
+		ctx.fillRect(0, 0, w, h);
+	});
+}
+
+export function whiteboardTexture() {
+	return canvasTexture("whiteboard", 512, 720, (ctx, w, h) => {
+		ctx.fillStyle = "#fbfbf9";
+		ctx.fillRect(0, 0, w, h);
+		ctx.lineCap = "round";
+		ctx.lineJoin = "round";
+		ctx.fillStyle = "#15252e";
+		ctx.font = "600 44px 'Comic Sans MS', 'Marker Felt', system-ui, sans-serif";
+		ctx.fillText("Bali launch", 48, 96);
+		ctx.strokeStyle = "#15252e";
+		ctx.lineWidth = 5;
+		ctx.beginPath();
+		ctx.moveTo(48, 118);
+		ctx.lineTo(330, 112);
+		ctx.stroke();
+		const items = ["ship MVP", "surf break", "demo day"];
+		ctx.font = "36px 'Comic Sans MS', 'Marker Felt', system-ui, sans-serif";
+		items.forEach((item, i) => {
+			const y = 200 + i * 80;
+			ctx.strokeStyle = i === 1 ? "#1f7a52" : "#2563eb";
+			ctx.strokeRect(56, y - 30, 30, 30);
+			if (i === 0) {
+				ctx.beginPath();
+				ctx.moveTo(60, y - 14);
+				ctx.lineTo(70, y - 4);
+				ctx.lineTo(92, y - 38);
+				ctx.stroke();
+			}
+			ctx.fillStyle = "#333";
+			ctx.fillText(item, 108, y - 2);
+		});
+		ctx.strokeStyle = "#d7263d";
+		ctx.lineWidth = 6;
+		ctx.beginPath();
+		ctx.moveTo(90, 560);
+		ctx.bezierCurveTo(180, 470, 300, 640, 420, 520);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(420, 520);
+		ctx.lineTo(392, 522);
+		ctx.moveTo(420, 520);
+		ctx.lineTo(414, 548);
+		ctx.stroke();
+	});
+}
+
 type Blob = { x: number; y: number; r: number; c: string };
 
 const WALLPAPERS: Record<Wallpaper, { bg: string; blobs: Blob[] }> = {

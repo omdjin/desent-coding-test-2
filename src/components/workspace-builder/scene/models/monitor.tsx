@@ -2,13 +2,10 @@ import { RoundedBox } from "@react-three/drei";
 import { useMemo } from "react";
 import type * as THREE from "three";
 import type { ModelSpec } from "@/data/products";
-import { monitorSize } from "../layout";
+import { MONITOR_BEZEL as BEZEL, monitorSize, SCREEN_BOTTOM } from "../layout";
 import { wallpaperTexture } from "../textures";
 
 type MonitorSpec = Extract<ModelSpec, { kind: "monitor" }>;
-
-const BEZEL = 0.008;
-const SCREEN_BOTTOM = 0.12;
 
 /** Monitor with its screen facing +z, standing on y = 0. */
 export function Monitor({ spec }: { spec: MonitorSpec }) {
@@ -79,27 +76,41 @@ function Stand({
 		);
 	}
 	const plastic = { color, roughness: 0.5, metalness: 0.2 };
-	return (
-		<group position-z={-0.05}>
-			{stand === "v" ? (
-				<>
-					<mesh position={[-0.07, 0.006, 0.03]} rotation-y={0.5}>
-						<boxGeometry args={[0.04, 0.012, 0.2]} />
-						<meshStandardMaterial {...plastic} />
-					</mesh>
-					<mesh position={[0.07, 0.006, 0.03]} rotation-y={-0.5}>
-						<boxGeometry args={[0.04, 0.012, 0.2]} />
-						<meshStandardMaterial {...plastic} />
-					</mesh>
-				</>
-			) : (
-				<mesh position-y={0.007}>
-					<cylinderGeometry args={[0.11, 0.12, 0.014, 40]} />
+	if (stand === "clamp") {
+		// LG Ergo-style arm: a column clamped to the back edge of the desk.
+		const bottom = -0.06;
+		return (
+			<group position-z={-0.11}>
+				<mesh position-y={(centerY + bottom) / 2}>
+					<cylinderGeometry args={[0.022, 0.022, centerY - bottom, 20]} />
 					<meshStandardMaterial {...plastic} />
 				</mesh>
-			)}
+				<mesh position={[0, 0.006, 0]}>
+					<boxGeometry args={[0.07, 0.012, 0.09]} />
+					<meshStandardMaterial {...plastic} />
+				</mesh>
+				<mesh position={[0, bottom, 0]}>
+					<boxGeometry args={[0.07, 0.012, 0.09]} />
+					<meshStandardMaterial {...plastic} />
+				</mesh>
+				<mesh position={[0, centerY, 0.05]} rotation-x={Math.PI / 2}>
+					<cylinderGeometry args={[0.016, 0.016, 0.1, 16]} />
+					<meshStandardMaterial {...plastic} />
+				</mesh>
+			</group>
+		);
+	}
+	return (
+		<group position-z={-0.05}>
+			<RoundedBox
+				args={[0.24, 0.012, 0.16]}
+				radius={0.005}
+				position={[0, 0.006, 0.02]}
+			>
+				<meshStandardMaterial {...plastic} />
+			</RoundedBox>
 			<mesh position-y={centerY / 2}>
-				<boxGeometry args={[0.04, centerY, 0.03]} />
+				<boxGeometry args={[0.045, centerY, 0.028]} />
 				<meshStandardMaterial {...plastic} />
 			</mesh>
 		</group>

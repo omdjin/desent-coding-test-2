@@ -19,6 +19,7 @@ const BACKGROUND = "#f1ebe2";
 export function WorkspaceScene({ items }: { items: Product[] }) {
 	const layout = useMemo(() => layoutScene(items), [items]);
 	const deskHeight = SIT_HEIGHT;
+	const context = { deskHeight, hasLaptop: layout.hasLaptop };
 
 	return (
 		<Canvas
@@ -88,17 +89,18 @@ export function WorkspaceScene({ items }: { items: Product[] }) {
 
 			{layout.floor.map(({ product, position, rotationY }) => (
 				<PlacedItem key={product.id} position={position} rotationY={rotationY}>
-					<ProductModel spec={product.model} deskHeight={deskHeight} />
+					<ProductModel spec={product.model} context={context} />
 				</PlacedItem>
 			))}
 			<group position={[0, deskHeight, layout.desk.z]}>
-				{layout.onDesk.map(({ product, position, rotationY }) => (
+				{layout.onDesk.map(({ product, position, rotationY, tilt }) => (
 					<PlacedItem
 						key={product.id}
 						position={position}
 						rotationY={rotationY}
+						tilt={tilt}
 					>
-						<ProductModel spec={product.model} deskHeight={deskHeight} />
+						<ProductModel spec={product.model} context={context} />
 					</PlacedItem>
 				))}
 			</group>
@@ -113,7 +115,7 @@ export function WorkspaceScene({ items }: { items: Product[] }) {
 				minPolarAngle={0.85}
 				maxPolarAngle={1.45}
 				minAzimuthAngle={-0.3}
-				maxAzimuthAngle={1.15}
+				maxAzimuthAngle={0.95}
 			/>
 		</Canvas>
 	);
