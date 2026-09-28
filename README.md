@@ -15,6 +15,21 @@ Interactive workspace builder for [monis.rent](https://www.monis.rent): pick a d
 - Pick a rental length; from 1 month, monis.rent's long-term weekly rates apply.
 - Check out with a per-item summary that links to each product on monis.rent.
 
+## Approach
+
+I wanted picking gear to feel like setting up a real room, not browsing a catalogue, so the preview is a 3D scene every choice drops into. monis.rent only has product photos on white backgrounds, so each item is a simple model built in code and matched to its photo, with real names and prices snapshotted from monis.rent's public catalogue. The selection and pricing rules (slot limits, "needs a monitor", long-term rates) are small pure functions with unit tests, kept apart from the UI.
+
+**Tech choices:** Next.js 16 (App Router) and React 19 with plain `useState`, since the state is small and lives on one page. The 3D scene uses React Three Fiber and drei. It's lazy-loaded so three.js stays out of the first page load, and it only re-renders when something changes. Tailwind CSS 4 carries monis.rent's colours, Biome handles linting and formatting, and Node's built-in test runner avoids extra test dependencies.
+
+**With more time I'd:**
+- replace the hand-built models with real 3D scans;
+- load the catalogue live, with sizes and availability, instead of from a snapshot;
+- hand the setup to monis.rent's real cart;
+- make setups shareable by link;
+- add a low-power mode for older phones;
+- add browser tests for the main flows;
+- turn on automatic deploys from `main`.
+
 ## Development
 
 ```bash
