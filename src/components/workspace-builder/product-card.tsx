@@ -13,11 +13,14 @@ export function ProductCard({
 	product,
 	state,
 	reason,
+	flash = false,
 	onSelect,
 }: {
 	product: Product;
 	state: CardState;
 	reason: string | null;
+	/** Briefly highlights the card after it was picked in the 3D room. */
+	flash?: boolean;
 	onSelect: () => void;
 }) {
 	const selected = state === "selected";
@@ -29,7 +32,10 @@ export function ProductCard({
 			onClick={onSelect}
 			disabled={blocked}
 			aria-pressed={selected}
+			data-product-id={product.id}
 			className={`group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all ${
+				flash ? "animate-pulse ring-4 ring-prime/35" : ""
+			} ${
 				selected
 					? "border-prime ring-2 ring-prime"
 					: "border-black/10 hover:-translate-y-0.5 hover:border-prime/40 hover:shadow-md"

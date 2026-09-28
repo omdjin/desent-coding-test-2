@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	CATEGORIES,
 	type Category,
@@ -43,6 +43,24 @@ export function WorkspaceBuilder() {
 	const [activeCategory, setActiveCategory] = useState<Category>("desks");
 	const [checkoutOpen, setCheckoutOpen] = useState(false);
 	const [confirmed, setConfirmed] = useState(false);
+	const [standing, setStanding] = useState(false);
+	const [resetKey, setResetKey] = useState(0);
+	const [flashId, setFlashId] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!flashId) return;
+		document
+			.querySelector(`[data-product-id="${flashId}"]`)
+			?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+		const timer = setTimeout(() => setFlashId(null), 1400);
+		return () => clearTimeout(timer);
+	}, [flashId]);
+
+	/** Clicking an object in the room jumps to its card in the panel. */
+	function handlePick(product: Product) {
+		setActiveCategory(product.category);
+		setFlashId(product.id);
+	}
 
 	// Selection order drives the scene (newest monitor lands on the right);
 	// catalog order keeps the checkout list grouped.
@@ -76,13 +94,48 @@ export function WorkspaceBuilder() {
 					products={products.filter((p) => p.category === activeCategory)}
 					stateOf={(p) => cardState(selectedIds, p, products)}
 					reasonOf={(p) => blockedReason(selectedIds, p, products)}
+					flashId={flashId}
 					onToggle={handleToggle}
 				/>
 
 				<div className="relative h-[420px] overflow-hidden rounded-2xl border border-black/10 bg-[#f1ebe2] sm:h-[540px]">
-					<WorkspaceScene items={selected} />
+					<WorkspaceScene
+						items={selected}
+						standing={standing}
+						resetKey={resetKey}
+						onPick={handlePick}
+					/>
+					<div className="absolute top-3 right-3 flex items-center gap-2">
+						<div className="flex rounded-full bg-white/90 p-1 shadow-sm backdrop-blur">
+							{[
+								{ label: "Sit", value: false },
+								{ label: "Stand", value: true },
+							].map((mode) => (
+								<button
+									key={mode.label}
+									type="button"
+									aria-pressed={standing === mode.value}
+									onClick={() => setStanding(mode.value)}
+									className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+										standing === mode.value
+											? "bg-prime text-prime-foreground"
+											: "text-prime hover:bg-cream"
+									}`}
+								>
+									{mode.label}
+								</button>
+							))}
+						</div>
+						<button
+							type="button"
+							onClick={() => setResetKey((key) => key + 1)}
+							className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-prime shadow-sm backdrop-blur hover:bg-white"
+						>
+							Reset view
+						</button>
+					</div>
 					<p className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs text-prime/70 shadow-sm backdrop-blur">
-						Drag to look around · scroll to zoom
+						Drag to look around · hover anything to see what it is
 					</p>
 				</div>
 			</div>

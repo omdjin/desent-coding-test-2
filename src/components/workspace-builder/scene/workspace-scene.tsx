@@ -6,28 +6,92 @@ import {
 	Lightformer,
 	OrbitControls,
 } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import { useMemo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+	type ComponentRef,
+	type RefObject,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import type * as THREE from "three";
 import type { Product } from "@/data/products";
-import { layoutScene, SIT_HEIGHT } from "./layout";
-import { ProductModel } from "./models";
+import { formatWeekly } from "@/lib/selection";
+import {
+	layoutScene,
+	type Placement,
+	SIT_HEIGHT,
+	STAND_HEIGHT,
+	type Vec3,
+} from "./layout";
+import { type ModelContext, ProductModel } from "./models";
 import { PlacedItem } from "./placed-item";
 import { Room } from "./room";
 
 const BACKGROUND = "#f1ebe2";
+const CAMERA_START: Vec3 = [1.3, 1.95, 3.3];
+const CAMERA_TARGET: Vec3 = [0, 0.8, -0.05];
 
-export function WorkspaceScene({ items }: { items: Product[] }) {
-	const layout = useMemo(() => layoutScene(items), [items]);
-	const deskHeight = SIT_HEIGHT;
-	const context = { deskHeight, hasLaptop: layout.hasLaptop };
+export function WorkspaceScene({
+	items,
+	standing,
+	resetKey,
+	onPick,
+}: {
+	items: Product[];
+	standing: boolean;
+	/** Bump to snap the camera back to its starting view. */
+	resetKey: number;
+	onPick: (product: Product) => void;
+}) {
+	const layout = useMemo(() => layoutScene(items, standing), [items, standing]);
+	const deskHeight = useRef(standing ? STAND_HEIGHT : SIT_HEIGHT);
+	const surface = useRef<THREE.Group>(null);
+	const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
+	const [hoveredId, setHoveredId] = useState<string | null>(null);
+	const context: ModelContext = { deskHeight, hasLaptop: layout.hasLaptop };
+
+	useEffect(() => {
+		const orbit = controls.current;
+		if (!resetKey || !orbit) return;
+		// With damping on, leftover drag momentum would drift the camera straight
+		// back, so flush it with damping off before snapping to the start pose.
+		orbit.enableDamping = false;
+		orbit.update();
+		orbit.object.position.set(...CAMERA_START);
+		orbit.target.set(...CAMERA_TARGET);
+		orbit.update();
+		orbit.enableDamping = true;
+	}, [resetKey]);
+
+	const renderItem = ({ product, position, rotationY, tilt }: Placement) => (
+		<PlacedItem
+			key={product.id}
+			position={position}
+			rotationY={rotationY}
+			tilt={tilt}
+			tag={{ name: product.name, price: formatWeekly(product.weekly) }}
+			hovered={hoveredId === product.id}
+			onHover={(hovering) =>
+				setHoveredId((current) =>
+					hovering ? product.id : current === product.id ? null : current,
+				)
+			}
+			onPick={() => onPick(product)}
+		>
+			<ProductModel spec={product.model} context={context} />
+		</PlacedItem>
+	);
 
 	return (
 		<Canvas
 			shadows
 			dpr={[1, 2]}
 			frameloop="demand"
-			camera={{ position: [1.3, 1.95, 3.3], fov: 38 }}
+			camera={{ position: CAMERA_START, fov: 38 }}
 			aria-label="3D preview of your workspace"
+			onPointerMissed={() => setHoveredId(null)}
 		>
 			<color attach="background" args={[BACKGROUND]} />
 			<fog attach="fog" args={[BACKGROUND, 8, 16]} />
@@ -87,27 +151,20 @@ export function WorkspaceScene({ items }: { items: Product[] }) {
 				color="#3b2a1a"
 			/>
 
-			{layout.floor.map(({ product, position, rotationY }) => (
-				<PlacedItem key={product.id} position={position} rotationY={rotationY}>
-					<ProductModel spec={product.model} context={context} />
-				</PlacedItem>
-			))}
-			<group position={[0, deskHeight, layout.desk.z]}>
-				{layout.onDesk.map(({ product, position, rotationY, tilt }) => (
-					<PlacedItem
-						key={product.id}
-						position={position}
-						rotationY={rotationY}
-						tilt={tilt}
-					>
-						<ProductModel spec={product.model} context={context} />
-					</PlacedItem>
-				))}
+			<DeskHeightDriver
+				target={standing ? STAND_HEIGHT : SIT_HEIGHT}
+				height={deskHeight}
+				surface={surface}
+			/>
+			{layout.floor.map(renderItem)}
+			<group ref={surface} position={[0, deskHeight.current, layout.desk.z]}>
+				{layout.onDesk.map(renderItem)}
 			</group>
 
 			<OrbitControls
+				ref={controls}
 				makeDefault
-				target={[0, 0.8, -0.05]}
+				target={CAMERA_TARGET}
 				enablePan={false}
 				enableDamping
 				minDistance={2.2}
@@ -119,4 +176,33 @@ export function WorkspaceScene({ items }: { items: Product[] }) {
 			/>
 		</Canvas>
 	);
+}
+
+/** Eases the shared desk height towards sitting/standing and lifts the desktop items with it. */
+function DeskHeightDriver({
+	target,
+	height,
+	surface,
+}: {
+	target: number;
+	height: RefObject<number>;
+	surface: RefObject<THREE.Group | null>;
+}) {
+	const invalidate = useThree((state) => state.invalidate);
+
+	// Wake the on-demand render loop so the frame loop below can start easing.
+	useEffect(() => {
+		if (height.current !== target) invalidate();
+	}, [target, height, invalidate]);
+
+	useFrame((_, rawDelta) => {
+		const dt = Math.min(rawDelta, 1 / 30);
+		const current = height.current;
+		const next = current + (target - current) * (1 - Math.exp(-5 * dt));
+		height.current = Math.abs(target - next) < 1e-4 ? target : next;
+		if (surface.current) surface.current.position.y = height.current;
+		if (height.current !== target) invalidate();
+	});
+
+	return null;
 }

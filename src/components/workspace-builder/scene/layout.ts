@@ -5,6 +5,7 @@ export type Vec3 = [number, number, number];
 export const WALL_Z = -0.5;
 export const LEFT_WALL_X = -2.1;
 export const SIT_HEIGHT = 0.74;
+export const STAND_HEIGHT = 1.12;
 export const SCREEN_BOTTOM = 0.12;
 export const MONITOR_BEZEL = 0.008;
 export const RISER_HEIGHT = 0.1;
@@ -43,7 +44,7 @@ const COLUMN_DEPTH: Partial<Record<Slot, number>> = {
 	mic: 0.14,
 };
 
-export function layoutScene(items: Product[]): SceneLayout {
+export function layoutScene(items: Product[], standing = false): SceneLayout {
 	const bySlot = (slot: Slot) => items.filter((p) => p.slot === slot);
 	const one = (slot: Slot) => bySlot(slot)[0];
 
@@ -70,11 +71,18 @@ export function layoutScene(items: Product[]): SceneLayout {
 	put(floor, deskProduct, [0, 0, deskZ]);
 	const walkingPad = one("walkingPad");
 	put(floor, walkingPad, [0, 0, deskZ + 0.32]);
+	// Standing up rolls the chair back out of the way.
+	const chairBack = standing ? 0.35 : 0;
 	if (walkingPad) {
-		put(floor, one("chair"), [W / 2 + 0.55, 0, deskZ + front + 0.15], -2.2);
+		put(
+			floor,
+			one("chair"),
+			[W / 2 + 0.55, 0, deskZ + front + 0.15 + chairBack],
+			-2.2,
+		);
 	} else {
 		// Pulled out and swivelled so it doesn't hide the desk.
-		put(floor, one("chair"), [0.42, 0, deskZ + front + 0.5], -1.2);
+		put(floor, one("chair"), [0.42, 0, deskZ + front + 0.5 + chairBack], -1.2);
 	}
 	put(floor, one("power"), [0.25, 0, WALL_Z + 0.12]);
 	put(floor, one("airPurifier"), [-W / 2 - 0.32, 0, WALL_Z + 0.2]);
