@@ -22,13 +22,12 @@ I wanted picking gear to feel like setting up a real room, not browsing a catalo
 **Tech choices:** Next.js 16 (App Router) and React 19 with plain `useState`, since the state is small and lives on one page. The 3D scene uses React Three Fiber and drei. It's lazy-loaded so three.js stays out of the first page load, and it only re-renders when something changes. Tailwind CSS 4 carries monis.rent's colours, Biome handles linting and formatting, and Node's built-in test runner avoids extra test dependencies.
 
 **With more time I'd:**
-- replace the hand-built models with real 3D scans;
-- load the catalogue live, with sizes and availability, instead of from a snapshot;
-- hand the setup to monis.rent's real cart;
+- load the catalogue live from monis.rent API, with sizes and availability, instead of from a snapshot;
 - make setups shareable by link;
 - add a low-power mode for older phones;
 - add browser tests for the main flows;
 - turn on automatic deploys from `main`.
+- add more test coverage
 
 ## Development
 
