@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const inter = Inter({
+	variable: "--font-inter",
 	subsets: ["latin"],
 });
 
@@ -16,17 +11,17 @@ export const metadata: Metadata = {
 	metadataBase: new URL(
 		process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 	),
-	title: "Desent Coding Test",
-	description: "A Next.js app for the Desent coding test.",
+	title: "Design Your Workspace — monis.rent",
+	description:
+		"Build your dream office setup — desk, chair, and accessories — and rent it in Bali with monis.rent.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
 	return (
-		<html
-			lang="en"
-			className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-		>
-			<body className="min-h-full flex flex-col">{children}</body>
+		<html lang="en" className={`${inter.variable} h-full antialiased`}>
+			<body className="min-h-full flex flex-col bg-background text-foreground">
+				{children}
+			</body>
 		</html>
 	);
 }
