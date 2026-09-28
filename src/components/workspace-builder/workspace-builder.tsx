@@ -11,10 +11,14 @@ import {
 import {
 	blockedReason,
 	cardState,
+	durationLabel,
+	formatMoney,
 	quote,
 	toggleProduct,
 } from "@/lib/selection";
+import { BundlePresets } from "./bundle-presets";
 import { CheckoutSummary } from "./checkout-summary";
+import { DurationPicker } from "./duration-picker";
 import { ProductPanel } from "./product-panel";
 
 const WorkspaceScene = dynamic(
@@ -46,6 +50,7 @@ export function WorkspaceBuilder() {
 	const [standing, setStanding] = useState(false);
 	const [resetKey, setResetKey] = useState(0);
 	const [flashId, setFlashId] = useState<string | null>(null);
+	const [weeks, setWeeks] = useState(1);
 
 	useEffect(() => {
 		if (!flashId) return;
@@ -73,7 +78,7 @@ export function WorkspaceBuilder() {
 		[selectedIds],
 	);
 	const checkoutItems = products.filter((p) => selectedIds.includes(p.id));
-	const { perWeek } = quote(selected, 1);
+	const { perWeek, total, savings } = quote(selected, weeks);
 
 	function handleToggle(product: Product) {
 		setSelectedIds((prev) => toggleProduct(prev, product, products));
@@ -86,6 +91,11 @@ export function WorkspaceBuilder() {
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 pb-32">
+			<BundlePresets
+				selectedIds={selectedIds}
+				weeks={weeks}
+				onApply={(bundle) => setSelectedIds(bundle.productIds)}
+			/>
 			<div className="grid gap-6 lg:grid-cols-[340px_1fr]">
 				<ProductPanel
 					categories={categories}
@@ -95,6 +105,7 @@ export function WorkspaceBuilder() {
 					stateOf={(p) => cardState(selectedIds, p, products)}
 					reasonOf={(p) => blockedReason(selectedIds, p, products)}
 					flashId={flashId}
+					weeks={weeks}
 					onToggle={handleToggle}
 				/>
 
@@ -102,6 +113,7 @@ export function WorkspaceBuilder() {
 					<WorkspaceScene
 						items={selected}
 						standing={standing}
+						weeks={weeks}
 						resetKey={resetKey}
 						onPick={handlePick}
 					/>
@@ -140,26 +152,41 @@ export function WorkspaceBuilder() {
 				</div>
 			</div>
 
-			<div className="flex items-center justify-between rounded-full border border-black/10 bg-white px-6 py-4 shadow-sm">
+			<div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-white px-6 py-4 shadow-sm sm:rounded-full">
 				<div>
 					<p className="text-sm font-semibold text-black">Ready to rent?</p>
 					<p className="text-xs text-prime/60">
-						{selected.length} items · ${perWeek}/week
+						{selected.length} items · {formatMoney(perWeek)}/week
+						{savings > 0 && (
+							<span className="font-medium text-prime">
+								{" "}
+								· you save {formatMoney(savings)}
+							</span>
+						)}
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={() => setCheckoutOpen(true)}
-					className="rounded-full bg-prime px-5 py-2.5 text-sm font-medium text-prime-foreground transition-opacity hover:opacity-90"
-				>
-					Rent your setup
-				</button>
+				<div className="flex flex-wrap items-center gap-4">
+					<DurationPicker weeks={weeks} onChange={setWeeks} />
+					<div className="text-right">
+						<p className="text-lg leading-tight font-semibold text-black">
+							{formatMoney(total)}
+						</p>
+						<p className="text-xs text-prime/60">for {durationLabel(weeks)}</p>
+					</div>
+					<button
+						type="button"
+						onClick={() => setCheckoutOpen(true)}
+						className="rounded-full bg-prime px-5 py-2.5 text-sm font-medium text-prime-foreground transition-opacity hover:opacity-90"
+					>
+						Rent your setup
+					</button>
+				</div>
 			</div>
 
 			{checkoutOpen && (
 				<CheckoutSummary
 					items={checkoutItems}
-					total={perWeek}
+					weeks={weeks}
 					confirmed={confirmed}
 					onClose={closeCheckout}
 					onConfirm={() => setConfirmed(true)}

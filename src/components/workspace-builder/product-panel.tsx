@@ -10,6 +10,7 @@ export function ProductPanel({
 	stateOf,
 	reasonOf,
 	flashId,
+	weeks,
 	onToggle,
 }: {
 	categories: { key: Category; label: string }[];
@@ -19,6 +20,7 @@ export function ProductPanel({
 	stateOf: (product: Product) => CardState;
 	reasonOf: (product: Product) => string | null;
 	flashId: string | null;
+	weeks: number;
 	onToggle: (product: Product) => void;
 }) {
 	return (
@@ -48,6 +50,7 @@ export function ProductPanel({
 						state={stateOf(product)}
 						reason={reasonOf(product)}
 						flash={flashId === product.id}
+						weeks={weeks}
 						onSelect={() => onToggle(product)}
 					/>
 				))}
