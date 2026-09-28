@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Product } from "@/data/products";
-import type { CardState } from "@/lib/selection";
+import { type CardState, formatWeekly } from "@/lib/selection";
 
 const BADGE: Record<CardState, string> = {
 	selected: "✓ Added",
@@ -64,7 +64,7 @@ export function ProductCard({
 					{product.name}
 				</p>
 				<p className="text-xs text-prime/60">
-					{blocked ? reason : `$${product.weekly}/week`}
+					{blocked ? reason : formatWeekly(product.weekly)}
 				</p>
 			</div>
 		</button>
