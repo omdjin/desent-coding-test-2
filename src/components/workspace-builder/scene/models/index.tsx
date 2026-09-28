@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import type { ModelSpec } from "@/data/products";
 import { Chair } from "./chair";
 import { Desk } from "./desk";
@@ -24,7 +25,10 @@ import {
 } from "./room-items";
 import { Headphones, HomePod, Laptop, MacMini, Mic } from "./tech";
 
-export type ModelContext = { deskHeight: number; hasLaptop: boolean };
+export type ModelContext = {
+	deskHeight: RefObject<number>;
+	hasLaptop: boolean;
+};
 
 export function ProductModel({
 	spec,
