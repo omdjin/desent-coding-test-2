@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 import {
 	CATEGORIES,
 	type Category,
@@ -15,7 +16,18 @@ import {
 } from "@/lib/selection";
 import { CheckoutSummary } from "./checkout-summary";
 import { ProductPanel } from "./product-panel";
-import { ScenePreview } from "./scene-preview";
+
+const WorkspaceScene = dynamic(
+	() => import("./scene/workspace-scene").then((m) => m.WorkspaceScene),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="flex h-full items-center justify-center text-sm text-prime/50">
+				Setting up your room…
+			</div>
+		),
+	},
+);
 
 const categories = CATEGORIES.filter((c) =>
 	products.some((p) => p.category === c.key),
@@ -34,10 +46,14 @@ export function WorkspaceBuilder() {
 
 	// Selection order drives the scene (newest monitor lands on the right);
 	// catalog order keeps the checkout list grouped.
-	const selected = selectedIds.flatMap((id) => {
-		const product = products.find((p) => p.id === id);
-		return product ? [product] : [];
-	});
+	const selected = useMemo(
+		() =>
+			selectedIds.flatMap((id) => {
+				const product = products.find((p) => p.id === id);
+				return product ? [product] : [];
+			}),
+		[selectedIds],
+	);
 	const checkoutItems = products.filter((p) => selectedIds.includes(p.id));
 	const { perWeek } = quote(selected, 1);
 
@@ -49,9 +65,6 @@ export function WorkspaceBuilder() {
 		setCheckoutOpen(false);
 		setConfirmed(false);
 	}
-
-	const bySlot = (slot: Product["slot"]) =>
-		selected.filter((p) => p.slot === slot);
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 pb-32">
@@ -66,14 +79,11 @@ export function WorkspaceBuilder() {
 					onToggle={handleToggle}
 				/>
 
-				<div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-black/10 bg-cream/40 p-6">
-					<ScenePreview
-						desk={bySlot("desk")[0]}
-						chair={bySlot("chair")[0]}
-						monitors={bySlot("monitor")}
-						lamp={bySlot("deskLamp")[0]}
-						plant={bySlot("plant")[0]}
-					/>
+				<div className="relative h-[420px] overflow-hidden rounded-2xl border border-black/10 bg-[#f1ebe2] sm:h-[540px]">
+					<WorkspaceScene items={selected} />
+					<p className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs text-prime/70 shadow-sm backdrop-blur">
+						Drag to look around · scroll to zoom
+					</p>
 				</div>
 			</div>
 
