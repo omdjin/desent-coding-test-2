@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Product, Slot } from "../data/products";
-import { cardState, quote, toggleProduct } from "./selection.ts";
+import { blockedReason, cardState, quote, toggleProduct } from "./selection.ts";
 
 const item = (
 	id: string,
@@ -26,6 +26,8 @@ const catalog = [
 	item("mon-2", "monitor", 21, 13),
 	item("mon-3", "monitor", 23, 19),
 	item("lamp", "deskLamp", 4, 3),
+	item("light-bar", "lightBar", 5, 3),
+	item("webcam", "webcam", 9, 6),
 ];
 const get = (id: string) => catalog.find((p) => p.id === id) as Product;
 
@@ -51,6 +53,26 @@ test("a third monitor replaces the oldest", () => {
 	assert.equal(cardState(sel, get("mon-3"), catalog), "swap");
 	sel = toggleProduct(sel, get("mon-3"), catalog);
 	assert.deepEqual(sel, ["desk-a", "mon-2", "mon-3"]);
+});
+
+test("monitor add-ons need a monitor", () => {
+	const sel = ["desk-a"];
+	assert.equal(cardState(sel, get("light-bar"), catalog), "blocked");
+	assert.equal(
+		blockedReason(sel, get("light-bar"), catalog),
+		"Needs a monitor",
+	);
+	assert.deepEqual(toggleProduct(sel, get("light-bar"), catalog), sel);
+});
+
+test("removing the last monitor drops its add-ons", () => {
+	let sel = ["desk-a", "mon-1", "mon-2"];
+	sel = toggleProduct(sel, get("light-bar"), catalog);
+	sel = toggleProduct(sel, get("webcam"), catalog);
+	sel = toggleProduct(sel, get("mon-1"), catalog);
+	assert.deepEqual(sel, ["desk-a", "mon-2", "light-bar", "webcam"]);
+	sel = toggleProduct(sel, get("mon-2"), catalog);
+	assert.deepEqual(sel, ["desk-a"]);
 });
 
 test("quote switches to long-term rates from 4 weeks", () => {

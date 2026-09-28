@@ -6,6 +6,9 @@ const SLOT_RULES: Partial<Record<Slot, SlotRule>> = {
 	desk: { max: 1, required: true },
 	chair: { max: 1, required: true },
 	monitor: { max: 2 },
+	lightBar: { max: 1, requires: "monitor" },
+	webcam: { max: 1, requires: "monitor" },
+	monitorStand: { max: 1, requires: "monitor" },
 };
 
 const SLOT_LABELS: Partial<Record<Slot, string>> = {
@@ -91,6 +94,10 @@ export function weeklyRate(product: Product, weeks: number): number {
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function formatWeekly(amount: number): string {
+	return amount === 0 ? "Free" : `$${amount}/week`;
+}
 
 export function quote(items: Product[], weeks: number) {
 	const perWeek = items.reduce((sum, p) => sum + weeklyRate(p, weeks), 0);
