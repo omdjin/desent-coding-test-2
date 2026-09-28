@@ -1,5 +1,5 @@
 import { SiteHeader } from "@/components/site-header";
-import { WorkspaceBuilderShell } from "@/components/workspace-builder/workspace-builder-shell";
+import { WorkspaceBuilder } from "@/components/workspace-builder/workspace-builder";
 
 export default function Home() {
 	return (
@@ -16,7 +16,7 @@ export default function Home() {
 					</p>
 				</div>
 				<div className="mt-10">
-					<WorkspaceBuilderShell />
+					<WorkspaceBuilder />
 				</div>
 			</main>
 		</>
